@@ -1,22 +1,25 @@
 # Amazon Web Service - Tools
 
-## Création de snapshot de volume ebs (snapshots_volumes)
+### Prérequis
+Installation des EC2 API Tools : http://aws.amazon.com/developertools/351
 
-### Description
+### Création de snapshot de volume ebs (snapshots_volumes)
+
+#### Description
 Automatisation de la création des snapshots des différents volumes portant le tag Backup a true
 
-### Usage
+#### Usage
 
 ```
 ./snapshots_volumes.sh
 ```
 
-## Suppression des snapshots de volume ebs (snapshots_volumes_purge)
+### Suppression des snapshots de volume ebs (snapshots_volumes_purge)
 
-### Description
+#### Description
 Automatisation de la suppression plus de vieux de x jours des snapshots des différents volumes portant le tag AutoCreated a true
 
-### Usage
+#### Usage
 
 ```
 ./snapshots_volumes_purge.sh
