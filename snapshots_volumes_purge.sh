@@ -17,8 +17,10 @@
 #
 #
 #################################################################################
+export JAVA_HOME=/usr/
 export EC2_HOME=/usr/local/ec2/
 export EC2_URL=https://ec2.eu-west-1.amazonaws.com
+export PATH=$PATH:$EC2_HOME/bin
 
 export AWS_ACCESS_KEY=NEED_YOUR_KEY
 export AWS_SECRET_KEY=NEED_YOUR_KEY
