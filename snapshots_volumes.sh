@@ -14,6 +14,7 @@
 #  V   | Date     | Auteur           | Description des modifications
 # -----|----------|------------------|------------------------------------------	
 # 1.0  |21-06-2013| J.Behuet	     | Initial
+# 1.1  |24-06-2013| J.Behuet	     | Edit output messages
 #
 #
 #################################################################################
@@ -55,25 +56,42 @@ do
    esac
 done
 
-echo "$(date +'%d/%m/%Y %H:%M:%S') -- Daily snapshot [ START ] --"
-echo "$(date +'%d/%m/%Y %H:%M:%S') Get volumes list"
+echo "[INFO] $(date +'%d/%m/%Y %H:%M:%S') -- Daily snapshot [ START ] --"
+echo "[INFO] $(date +'%d/%m/%Y %H:%M:%S') Get volumes list"
 
 VOLUME_LIST=(`ec2-describe-volumes --filter "tag:Backup=true" | grep ATTACHMENT | awk '{ print $2";"$3; }'`)
+
+if [ "$VOLUME_LIST" != "0" ]; then
+  echo "[ERROR] $(date +'%d/%m/%Y %H:%M:%S') Get volumes list"
+  exit 1
+fi
 
 for v in "${VOLUME_LIST[@]}"; do
 
   VOLUME_INFO=(`echo $v | tr ';' ' '`)
-  echo "$(date +'%d/%m/%Y %H:%M:%S') Get instance name (${VOLUME_INFO[1]})"
+  echo "[INFO] $(date +'%d/%m/%Y %H:%M:%S') Get instance name (${VOLUME_INFO[1]})"
   INSTANCE_NAME=(`ec2-describe-instances ${VOLUME_INFO[1]} | grep TAG | awk '{ print $5 }'`)
+  if [ "$INSTANCE_NAME" != "0" ]; then
+    echo "[WARN] $(date +'%d/%m/%Y %H:%M:%S') Get instance name (${VOLUME_INFO[1]})"
+    break
+  fi
 
-  echo "$(date +'%d/%m/%Y %H:%M:%S') Snapshot $INSTANCE_NAME - volume id : ${VOLUME_INFO[0]}";
+  echo "[INFO] $(date +'%d/%m/%Y %H:%M:%S') Snapshot $INSTANCE_NAME - volume id : ${VOLUME_INFO[0]}";
   SNAP_ID=(`ec2-create-snapshot ${VOLUME_INFO[0]} --description "$INSTANCE_NAME-$(date +'%d%m%Y')" | awk '{ print $2 }'`)
+  if [ "$SNAP_ID" != "0" ]; then
+    echo "[WARN] $(date +'%d/%m/%Y %H:%M:%S') Get snap id (${VOLUME_INFO[0]})"
+    break
+  fi
 
-  echo "$(date +'%d/%m/%Y %H:%M:%S') add tag to snapshot ($SNAP_ID)"
+
+  echo "[INFO] $(date +'%d/%m/%Y %H:%M:%S') add tag to snapshot ($SNAP_ID)"
   ec2-create-tags $SNAP_ID --tag "AutoCreated=true"
-
+  if [ "$?" != "0" ]; then
+    echo "[WARN] $(date +'%d/%m/%Y %H:%M:%S') Add tag ($SNAP_ID)"
+    break
+  fi
 done
 
-echo "$(date +'%d/%m/%Y %H:%M:%S') -- Daily snapshot [ END ] --"
+echo "[INFO] $(date +'%d/%m/%Y %H:%M:%S') -- Daily snapshot [ END ] --"
 
 exit 0

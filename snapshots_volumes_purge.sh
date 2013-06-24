@@ -14,6 +14,7 @@
 #  V   | Date     | Auteur           | Description des modifications
 # -----|----------|------------------|------------------------------------------	
 # 1.0  |21-06-2013| J.Behuet	     | Initial
+# 1.1  |24-06-2013| J.Behuet         | Edit output messages
 #
 #
 #################################################################################
@@ -55,10 +56,16 @@ do
    esac
 done
 
-echo "$(date +'%d/%m/%Y %H:%M:%S') -- Snapshots purge [ START ] --"
-echo "$(date +'%d/%m/%Y %H:%M:%S') Get snapshots list"
+echo "[INFO] $(date +'%d/%m/%Y %H:%M:%S') -- Snapshots purge [ START ] --"
+echo "[INFO] $(date +'%d/%m/%Y %H:%M:%S') Get snapshots list"
 
-SNAP_LIST=(`ec2-describe-snapshots --filter "tag:AutoCreated=true" | grep SNAPSHOT | awk '{ print $2";"$5";"$9; }'`)
+SNAP_LIST=(`ec2e-describe-snapshots --filter "tag:AutoCreated=true" | grep SNAPSHOT | awk '{ print $2";"$5";"$9; }'`)
+
+if [ "$SNAP_LIST" != "0" ]; then
+  echo "[ERROR] $(date +'%d/%m/%Y %H:%M:%S') Get snapshots list"
+  exit 1
+fi
+
 #Modifier cette valeur pour augmenter ou diminuer la rention maximale d'un snapshot
 MAX_RETENTION=7
 
@@ -77,16 +84,20 @@ for v in "${SNAP_LIST[@]}"; do
   # Test si la date est suppérieur à Xjours alors suppresion 
   if [ $DATE_DIFF -gt $MAX_RETENTION ]; then
     ec2-delete-snapshot ${SNAP_INFO[0]}
-    echo "$(date +'%d/%m/%Y %H:%M:%S') ${SNAP_INFO[2]} (${SNAP_INFO[0]}) [ DELETED ]"
+    if [ "$?" != "0" ]; then
+      echo "[WARN] $(date +'%d/%m/%Y %H:%M:%S') Delete snapshots ${SNAP_INFO[2]} (${SNAP_INFO[0]})"
+    else
+      echo "[INFO] $(date +'%d/%m/%Y %H:%M:%S') ${SNAP_INFO[2]} (${SNAP_INFO[0]}) [ DELETED ]"
+    fi 
     ((DELETED++))
   else
-    echo "$(date +'%d/%m/%Y %H:%M:%S') ${SNAP_INFO[2]} (${SNAP_INFO[0]}) [ KEEP ]"
+    echo "[INFO] $(date +'%d/%m/%Y %H:%M:%S') ${SNAP_INFO[2]} (${SNAP_INFO[0]}) [ KEEP ]"
   fi
 
   ((TOTAL++))
 
 done
-echo "$(date +'%d/%m/%Y %H:%M:%S') -- Result : $DELETED/$TOTAL Snapshot(s) deleted --"
-echo "$(date +'%d/%m/%Y %H:%M:%S') -- Snapshots purge [ END ] --"
+echo "[INFO] $(date +'%d/%m/%Y %H:%M:%S') -- Result : $DELETED/$TOTAL Snapshot(s) deleted --"
+echo "[INFO] $(date +'%d/%m/%Y %H:%M:%S') -- Snapshots purge [ END ] --"
 
 exit 0
