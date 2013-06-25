@@ -1,8 +1,8 @@
 # Amazon Web Service - Tools
 
 ### Prérequis
-Installation des EC2 API Tools : http://aws.amazon.com/developertools/351
-Installation des RDS API Tools : http://aws.amazon.com/developertools/2928
+* Installation des EC2 API Tools : http://aws.amazon.com/developertools/351
+* Installation des RDS API Tools : http://aws.amazon.com/developertools/2928
 
 ### Création de snapshot de volume ebs (snapshots_volumes)
 
