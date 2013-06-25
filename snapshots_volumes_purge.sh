@@ -1,12 +1,12 @@
 #!/bin/bash
 #################################################################################
-# Ident		: snapshots_purge.sh - 1.0
+# Ident		: snapshots_volumes_purge.sh - 1.0
 # Auteur	: J.Behuet
 #
 # Description 	: Automatisation de la suppression des snapshots ayantle tag
 #		  AutoCreate à true
 # 
-# Usage		: ./snapshots_purge.sh
+# Usage		: ./snapshots_volumes_purge.sh
 # Remarque(s)	: Ce script nécessite l'installation des Amazon EC2 API Tools
 #		  http://aws.amazon.com/developertools/351
 #
@@ -30,9 +30,16 @@ VERSION="1.0"
 DESCRIPTION="Automatisation de la suppression des snapshot ayant le tag AutoCreate à true"
 
 function print_usage() {
-  echo -e "Usage\t: ./snapshots_purge.sh"
+  echo -e "Usage\t: ./snapshots_volumes_purge.sh"
   echo -e "ARGS"
   echo -e "\t-h : Print help"
+}
+
+function print_help() {
+  print_version
+  echo ""
+  print_usage
+  echo $DESCRIPTION
 }
 
 function print_version() {
@@ -40,7 +47,7 @@ function print_version() {
   echo -e "Auteur\t: J.Behuet"
 }
 
-while getopts :hv OPT
+while getopts :h OPT
 do
   case $OPT in
     h)

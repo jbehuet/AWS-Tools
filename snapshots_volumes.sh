@@ -35,12 +35,19 @@ function print_usage() {
   echo -e "\t-h : Print help"
 }
 
+function print_help() {
+  print_version
+  echo ""
+  print_usage
+  echo $DESCRIPTION
+}
+
 function print_version() {
   echo -e "Ident\t: $SCRIPTNAME version $VERSION"
   echo -e "Auteur\t: J.Behuet"
 }
 
-while getopts :hv OPT
+while getopts :h OPT
 do
   case $OPT in
     h)
